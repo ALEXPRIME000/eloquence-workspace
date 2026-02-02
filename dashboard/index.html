@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eloquence Prima - Executive Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .glow { box-shadow: 0 0 30px rgba(234, 179, 8, 0.3); }
+        .accent { color: #eab308; }
+        .accent-bg { background: linear-gradient(135deg, #eab308 0%, #f59e0b 100%); }
+    </style>
+</head>
+<body class="min-h-screen text-white p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
+                    🎯 Eloquence Prima Dashboard
+                </h1>
+                <p class="text-gray-400 mt-1">Executive Director Agent • Orchestration & Delegation</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="status-indicator" class="flex items-center gap-2 glass px-4 py-2 rounded-full">
+                    <span class="w-3 h-3 bg-yellow-500 rounded-full pulse"></span>
+                    <span id="status-text">Active</span>
+                </div>
+                <div class="text-right text-sm text-gray-400">
+                    <div id="current-time"></div>
+                    <div id="last-update"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Quick Stats Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="glass rounded-xl p-5 glow">
+                <div class="text-gray-400 text-sm">Today's Tasks</div>
+                <div class="text-3xl font-bold accent" id="tasks-today">0</div>
+                <div class="text-xs text-green-400 mt-1">↑ In Progress</div>
+            </div>
+            <div class="glass rounded-xl p-5">
+                <div class="text-gray-400 text-sm">Messages Processed</div>
+                <div class="text-3xl font-bold text-purple-400" id="messages-count">0</div>
+                <div class="text-xs text-gray-500 mt-1">This Session</div>
+            </div>
+            <div class="glass rounded-xl p-5">
+                <div class="text-gray-400 text-sm">Tokens Used</div>
+                <div class="text-3xl font-bold text-orange-400" id="tokens-used">0</div>
+                <div class="text-xs text-gray-500 mt-1">Estimated</div>
+            </div>
+            <div class="glass rounded-xl p-5">
+                <div class="text-gray-400 text-sm">Cost Today</div>
+                <div class="text-3xl font-bold text-green-400" id="cost-today">$0.00</div>
+                <div class="text-xs text-gray-500 mt-1">API Usage</div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Active Projects -->
+            <div class="glass rounded-xl p-6 lg:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    📋 Active Projects
+                </h2>
+                <div id="projects-list" class="space-y-3">
+                    <!-- Projects loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Current Status -->
+            <div class="glass rounded-xl p-6">
+                <h2 class="text-xl font-semibold mb-4">⚡ Current State</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                        <span class="text-gray-400">Current Task</span>
+                        <span class="text-yellow-400 font-medium" id="current-task">Loading...</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                        <span class="text-gray-400">Active Model</span>
+                        <span class="text-purple-400 font-medium" id="active-model">Claude Opus 4.5</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                        <span class="text-gray-400">Session</span>
+                        <span class="text-green-400 font-medium" id="session-id">main</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                        <span class="text-gray-400">Last Heartbeat</span>
+                        <span class="text-yellow-400 font-medium" id="last-heartbeat">--:--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Actions -->
+        <div class="glass rounded-xl p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">🚀 Recent Actions</h2>
+            <div id="recent-actions" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <!-- Actions loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Owner & Sibling Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass rounded-xl p-6">
+                <h2 class="text-xl font-semibold mb-4">👤 Owner</h2>
+                <div class="space-y-2">
+                    <div class="text-lg font-medium" id="owner-name">Loading...</div>
+                    <div class="text-gray-400 text-sm">Executive Director's Human</div>
+                </div>
+            </div>
+            <div class="glass rounded-xl p-6">
+                <h2 class="text-xl font-semibold mb-4">🤝 Sibling Agent</h2>
+                <div class="space-y-2">
+                    <div class="text-lg font-medium" id="sibling-name">Alex Prime</div>
+                    <a id="sibling-link" href="#" class="text-blue-400 text-sm hover:underline">View Dashboard →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>Eloquence Prima • Executive Director Agent • Powered by OpenClaw</p>
+            <p class="mt-1">Where efficiency meets eloquence 🎯</p>
+        </footer>
+    </div>
+
+    <script>
+        // Load status data
+        async function loadStatus() {
+            try {
+                const response = await fetch('status.json?' + Date.now());
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('tasks-today').textContent = data.stats.tasksToday;
+                document.getElementById('messages-count').textContent = data.stats.messagesProcessed;
+                document.getElementById('tokens-used').textContent = (data.stats.tokensEstimated / 1000).toFixed(0) + 'K';
+                document.getElementById('cost-today').textContent = '$' + data.stats.costEstimated.toFixed(2);
+                
+                // Update status
+                document.getElementById('status-text').textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+                document.getElementById('current-task').textContent = data.currentTask;
+                document.getElementById('active-model').textContent = data.model;
+                document.getElementById('session-id').textContent = data.session;
+                document.getElementById('last-heartbeat').textContent = new Date(data.heartbeat.lastCheck).toLocaleTimeString();
+                document.getElementById('last-update').textContent = 'Updated: ' + new Date(data.lastUpdate).toLocaleTimeString();
+                
+                // Owner info
+                document.getElementById('owner-name').textContent = data.owner.name;
+                
+                // Sibling info
+                document.getElementById('sibling-name').textContent = data.sibling.name;
+                document.getElementById('sibling-link').href = data.sibling.repo;
+                
+                // Projects
+                const projectsList = document.getElementById('projects-list');
+                projectsList.innerHTML = data.activeProjects.map(p => `
+                    <div class="flex justify-between items-center p-4 bg-gray-800/50 rounded-lg">
+                        <div>
+                            <span class="text-yellow-400 font-mono text-sm">${p.id}</span>
+                            <span class="ml-2 font-medium">${p.name}</span>
+                        </div>
+                        <span class="px-3 py-1 ${p.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'} rounded-full text-sm">
+                            ${p.status}
+                        </span>
+                    </div>
+                `).join('');
+                
+                // Recent actions
+                const actionsList = document.getElementById('recent-actions');
+                actionsList.innerHTML = data.recentActions.map(action => `
+                    <div class="p-3 bg-gray-800/50 rounded-lg text-sm">
+                        <span class="text-green-400 mr-2">✓</span>${action}
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Failed to load status:', error);
+            }
+        }
+        
+        // Update current time
+        function updateTime() {
+            document.getElementById('current-time').textContent = new Date().toLocaleString();
+        }
+        
+        // Initialize
+        loadStatus();
+        updateTime();
+        setInterval(updateTime, 1000);
+        setInterval(loadStatus, 30000); // Refresh every 30 seconds
+    </script>
+</body>
+</html>
